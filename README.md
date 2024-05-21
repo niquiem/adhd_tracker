@@ -6,6 +6,7 @@ A simple habit tracker application built with Python using object-oriented progr
 
 - Create and manage habits
 - Track habit completion and streaks
+- Assign rewards for completing tasks
 
 ## Getting Started
 
