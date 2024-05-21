@@ -1,12 +1,18 @@
 from habit import Habit
 from user import User
+from reward import Reward
 
 def main():
     user = User("Harry")
     print(f"Created user: {user.username}")
 
+    reward_system = Reward()
+
     habit1 = Habit("Practice Quidditch", "daily")
     habit2 = Habit("Read a Chapter of 'Magical Theory'", "daily")
+
+    habit1.set_reward(reward_system)
+    habit2.set_reward(reward_system)
     
     user.add_habit(habit1)
     user.add_habit(habit2)
