@@ -24,3 +24,13 @@ class User:
             habit = Habit(habit_data[0], habit_data[1], habit_data[2], habit_data[3].split(','))
             habits.append(habit)
         return habits
+
+    def get_longest_streak(self):
+        if not self.habits:
+            return None
+        return max(self.habits, key=lambda habit: habit.streak)
+
+    def get_most_missed_habit(self):
+        if not self.habits:
+            return None
+        return min(self.habits, key=lambda habit: len(habit.completion_dates))
