@@ -31,6 +31,14 @@ def main():
     habit1.mark_complete()
     print(f"Habit {habit1.habit_name} marked complete. Current streak: {habit1.check_streak()}")
 
+    longest_streak_habit = user.get_longest_streak()
+    if longest_streak_habit:
+        print(f"Longest streak: {longest_streak_habit.habit_name} with streak of {longest_streak_habit.streak}")
+
+    most_missed_habit = user.get_most_missed_habit()
+    if most_missed_habit:
+        print(f"Most missed habit: {most_missed_habit.habit_name} with {len(most_missed_habit.completion_dates)} completions")
+
     user.remove_habit("Read a Chapter of 'Magical Theory'")
     print(f"After removing a habit, {user.username}'s habits:")
     for habit in user.get_habits():
