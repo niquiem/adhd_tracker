@@ -1,19 +1,26 @@
 from habit import Habit
 from user import User
 from reward import Reward
+from database import create_table, add_user_to_db, get_user_id
 
 def main():
-    user = User("Harry")
+    create_table()
+
+    username = "Harry"
+    add_user_to_db(username)
+    user_id = get_user_id(username)
+
+    user = User(username, user_id)
     print(f"Created user: {user.username}")
 
     reward_system = Reward()
 
     habit1 = Habit("Practice Quidditch", "daily")
     habit2 = Habit("Read a Chapter of 'Magical Theory'", "daily")
-
+    
     habit1.set_reward(reward_system)
     habit2.set_reward(reward_system)
-    
+
     user.add_habit(habit1)
     user.add_habit(habit2)
 
