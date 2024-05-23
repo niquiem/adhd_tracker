@@ -7,6 +7,7 @@ class Habit:
         self.streak = streak
         self.creation_date = datetime.now()
         self.completion_dates = completion_dates if completion_dates else []
+        self.reward = None
 
     def mark_complete(self):
         self.completion_dates.append(datetime.now().isoformat())
