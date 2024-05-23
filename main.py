@@ -2,6 +2,7 @@ from user import User
 from habit import Habit
 from reward import Reward
 from database import create_table, add_user_to_db, get_user_id
+from analytics import Analytics
 
 def create_user(username):
     add_user_to_db(username)
@@ -20,6 +21,7 @@ def main():
     username = input("Enter your username: ")
     user = create_user(username)
     reward_system = Reward()
+    analytics = Analytics(user.get_habits())
 
     while True:
         print("\nMenu:")
@@ -45,6 +47,7 @@ def main():
             habit = Habit(habit_name, frequency)
             habit.set_reward(reward_system)
             user.add_habit(habit)
+            analytics = Analytics(user.get_habits())  # Update analytics
             print(f"Habit '{habit_name}' added.")
 
         elif choice == '2':
@@ -69,14 +72,14 @@ def main():
                 print(f"Habit '{habit_name}' not found.")
 
         elif choice == '5':
-            longest_streak_habit = user.get_longest_streak()
+            longest_streak_habit = analytics.longest_streak()
             if longest_streak_habit:
                 print(f"Longest streak: {longest_streak_habit.habit_name} with streak of {longest_streak_habit.streak}")
             else:
                 print("No habits found.")
 
         elif choice == '6':
-            most_missed_habit = user.get_most_missed_habit()
+            most_missed_habit = analytics.most_missed()
             if most_missed_habit:
                 print(f"Most missed habit: {most_missed_habit.habit_name} with {len(most_missed_habit.completion_dates)} completions")
             else:
@@ -95,6 +98,7 @@ def main():
         elif choice == '9':
             habit_name = input("Enter the name of the habit to delete: ")
             user.remove_habit(habit_name)
+            analytics = Analytics(user.get_habits())  # Update analytics
             print(f"Habit '{habit_name}' deleted.")
             display_habits(user)
 
