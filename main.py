@@ -30,13 +30,18 @@ def main():
         print("5. View longest streak")
         print("6. View most missed habit")
         print("7. Add custom reward")
-        print("8. Quit")
+        print("8. View custom rewards")
+        print("9. Delete a habit")
+        print("10. Quit")
         
         choice = input("Choose an option: ")
 
         if choice == '1':
             habit_name = input("Enter the habit name: ")
             frequency = input("Enter the habit frequency (daily/weekly): ")
+            if frequency not in ["daily", "weekly"]:
+                print("Invalid frequency. Please enter 'daily' or 'weekly'.")
+                continue
             habit = Habit(habit_name, frequency)
             habit.set_reward(reward_system)
             user.add_habit(habit)
@@ -83,6 +88,17 @@ def main():
             print(f"Custom reward '{custom_reward}' added.")
 
         elif choice == '8':
+            print("\nCustom Rewards:")
+            for reward in reward_system.custom_rewards:
+                print(f"- {reward}")
+
+        elif choice == '9':
+            habit_name = input("Enter the name of the habit to delete: ")
+            user.remove_habit(habit_name)
+            print(f"Habit '{habit_name}' deleted.")
+            display_habits(user)
+
+        elif choice == '10':
             print("Goodbye!")
             break
 
