@@ -1,48 +1,93 @@
-from habit import Habit
 from user import User
+from habit import Habit
 from reward import Reward
 from database import create_table, add_user_to_db, get_user_id
 
-def main():
-    create_table()
-
-    username = "Harry"
+def create_user(username):
     add_user_to_db(username)
     user_id = get_user_id(username)
+    return User(username, user_id)
 
-    user = User(username, user_id)
-    print(f"Created user: {user.username}")
+def display_habits(user):
+    print(f"\n{user.username}'s habits:")
+    for habit in user.get_habits():
+        print(f"- {habit.habit_name} ({habit.frequency}), Streak: {habit.streak}")
 
+def main():
+    create_table()
+    
+    print("Welcome to the Habit Tracker!")
+    username = input("Enter your username: ")
+    user = create_user(username)
     reward_system = Reward()
 
-    habit1 = Habit("Practice Quidditch", "daily")
-    habit2 = Habit("Read a Chapter of 'Magical Theory'", "daily")
-    
-    habit1.set_reward(reward_system)
-    habit2.set_reward(reward_system)
+    while True:
+        print("\nMenu:")
+        print("1. Add a habit")
+        print("2. View habits")
+        print("3. Mark habit as complete")
+        print("4. Mark habit as incomplete")
+        print("5. View longest streak")
+        print("6. View most missed habit")
+        print("7. Add custom reward")
+        print("8. Quit")
+        
+        choice = input("Choose an option: ")
 
-    user.add_habit(habit1)
-    user.add_habit(habit2)
+        if choice == '1':
+            habit_name = input("Enter the habit name: ")
+            frequency = input("Enter the habit frequency (daily/weekly): ")
+            habit = Habit(habit_name, frequency)
+            habit.set_reward(reward_system)
+            user.add_habit(habit)
+            print(f"Habit '{habit_name}' added.")
 
-    print(f"{user.username}'s habits:")
-    for habit in user.get_habits():
-        print(f"- {habit.habit_name} ({habit.frequency})")
+        elif choice == '2':
+            display_habits(user)
 
-    habit1.mark_complete()
-    print(f"Habit {habit1.habit_name} marked complete. Current streak: {habit1.check_streak()}")
+        elif choice == '3':
+            habit_name = input("Enter the name of the habit you completed: ")
+            habit = next((h for h in user.get_habits() if h.habit_name == habit_name), None)
+            if habit:
+                habit.mark_complete()
+                print(f"Habit '{habit_name}' marked as complete.")
+            else:
+                print(f"Habit '{habit_name}' not found.")
 
-    longest_streak_habit = user.get_longest_streak()
-    if longest_streak_habit:
-        print(f"Longest streak: {longest_streak_habit.habit_name} with streak of {longest_streak_habit.streak}")
+        elif choice == '4':
+            habit_name = input("Enter the name of the habit you want to mark as incomplete: ")
+            habit = next((h for h in user.get_habits() if h.habit_name == habit_name), None)
+            if habit:
+                habit.mark_incomplete()
+                print(f"Habit '{habit_name}' marked as incomplete.")
+            else:
+                print(f"Habit '{habit_name}' not found.")
 
-    most_missed_habit = user.get_most_missed_habit()
-    if most_missed_habit:
-        print(f"Most missed habit: {most_missed_habit.habit_name} with {len(most_missed_habit.completion_dates)} completions")
+        elif choice == '5':
+            longest_streak_habit = user.get_longest_streak()
+            if longest_streak_habit:
+                print(f"Longest streak: {longest_streak_habit.habit_name} with streak of {longest_streak_habit.streak}")
+            else:
+                print("No habits found.")
 
-    user.remove_habit("Read a Chapter of 'Magical Theory'")
-    print(f"After removing a habit, {user.username}'s habits:")
-    for habit in user.get_habits():
-        print(f"- {habit.habit_name} ({habit.frequency})")
+        elif choice == '6':
+            most_missed_habit = user.get_most_missed_habit()
+            if most_missed_habit:
+                print(f"Most missed habit: {most_missed_habit.habit_name} with {len(most_missed_habit.completion_dates)} completions")
+            else:
+                print("No habits found.")
+
+        elif choice == '7':
+            custom_reward = input("Enter the custom reward: ")
+            reward_system.add_custom_reward(custom_reward)
+            print(f"Custom reward '{custom_reward}' added.")
+
+        elif choice == '8':
+            print("Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
     main()
