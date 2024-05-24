@@ -19,8 +19,9 @@ class User:
 
     def load_habits(self):
         habits_data = load_habits_from_db(self.user_id)
+        print(f"habits_data: {habits_data}")  # Debugging line
         habits = []
         for habit_data in habits_data:
-            habit = Habit(habit_data[0], habit_data[1], habit_data[2], habit_data[3].split(','))
-            habits.append(habit)
+            print(f"habit_data: {habit_data}")  # Debugging line
+            habits.append(habit_data)  # Directly append the Habit object
         return habits
