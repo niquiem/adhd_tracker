@@ -1,5 +1,5 @@
 from habit import Habit
-from reward import Reward
+from reward import Reward  # Ensure Reward is imported
 import database as db
 import random
 
