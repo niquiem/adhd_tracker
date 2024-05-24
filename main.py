@@ -1,5 +1,6 @@
 from user import User
 from habit import Habit
+from habittracker import HabitTracker
 from reward import Reward
 from database import create_table, add_user_to_db, get_user_id
 from analytics import Analytics
@@ -9,9 +10,9 @@ def create_user(username):
     user_id = get_user_id(username)
     return User(username, user_id)
 
-def display_habits(user):
-    print(f"\n{user.username}'s habits:")
-    for habit in user.get_habits():
+def display_habits(habit_tracker):
+    print(f"\nHabits:")
+    for habit in habit_tracker.view_all_habits():
         print(f"- {habit.habit_name} ({habit.frequency}), Streak: {habit.streak}")
 
 def main():
@@ -20,8 +21,8 @@ def main():
     print("Welcome to the Habit Tracker!")
     username = input("Enter your username: ")
     user = create_user(username)
-    reward_system = Reward()
-    analytics = Analytics(user.get_habits())
+    habit_tracker = HabitTracker(user.user_id)
+    analytics = Analytics(habit_tracker.view_all_habits())
 
     while True:
         print("\nMenu:")
@@ -45,26 +46,27 @@ def main():
                 print("Invalid frequency. Please enter 'daily' or 'weekly'.")
                 continue
             habit = Habit(habit_name, frequency)
-            habit.set_reward(reward_system)
-            user.add_habit(habit)
-            analytics = Analytics(user.get_habits())  # Update analytics
+            habit.set_reward(habit_tracker.reward)
+            habit_tracker.add_habit(habit)
+            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
             print(f"Habit '{habit_name}' added.")
 
         elif choice == '2':
-            display_habits(user)
+            display_habits(habit_tracker)
 
         elif choice == '3':
             habit_name = input("Enter the name of the habit you completed: ")
-            habit = next((h for h in user.get_habits() if h.habit_name == habit_name), None)
+            habit, reward_message = habit_tracker.mark_habit_complete(habit_name)
             if habit:
-                habit.mark_complete()
                 print(f"Habit '{habit_name}' marked as complete.")
+                if reward_message:
+                    print(f"Reward: {reward_message}")
             else:
                 print(f"Habit '{habit_name}' not found.")
 
         elif choice == '4':
             habit_name = input("Enter the name of the habit you want to mark as incomplete: ")
-            habit = next((h for h in user.get_habits() if h.habit_name == habit_name), None)
+            habit = next((h for h in habit_tracker.view_all_habits() if h.habit_name == habit_name), None)
             if habit:
                 habit.mark_incomplete()
                 print(f"Habit '{habit_name}' marked as incomplete.")
@@ -87,20 +89,20 @@ def main():
 
         elif choice == '7':
             custom_reward = input("Enter the custom reward: ")
-            reward_system.add_custom_reward(custom_reward)
+            habit_tracker.reward.add_custom_reward(custom_reward)
             print(f"Custom reward '{custom_reward}' added.")
 
         elif choice == '8':
             print("\nCustom Rewards:")
-            for reward in reward_system.custom_rewards:
+            for reward in habit_tracker.reward.custom_rewards:
                 print(f"- {reward}")
 
         elif choice == '9':
             habit_name = input("Enter the name of the habit to delete: ")
-            user.remove_habit(habit_name)
-            analytics = Analytics(user.get_habits())  # Update analytics
+            habit_tracker.remove_habit(habit_name)
+            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
             print(f"Habit '{habit_name}' deleted.")
-            display_habits(user)
+            display_habits(habit_tracker)
 
         elif choice == '10':
             print("Goodbye!")

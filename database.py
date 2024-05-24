@@ -42,6 +42,12 @@ def add_habit_to_db(habit, user_id):
                            (user_id, habit.habit_name, habit.frequency, habit.streak, ','.join(habit.completion_dates)))
         conn.commit()
 
+def remove_habit_from_db(habit_name, user_id):
+    with create_connection() as conn:
+        c = conn.cursor()
+        execute_with_retry(c, "DELETE FROM habits WHERE user_id = ? AND name = ?", (user_id, habit_name))
+        conn.commit()
+
 def update_habit_in_db(habit, user_id):
     with create_connection() as conn:
         c = conn.cursor()
