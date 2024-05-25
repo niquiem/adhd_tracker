@@ -2,7 +2,7 @@ from user import User
 from habit import Habit
 from habittracker import HabitTracker
 from reward import Reward
-from database import create_table, add_user_to_db, get_user_id
+from database import create_table, add_user_to_db, get_user_id, load_users_from_db
 from analytics import Analytics
 
 def create_user(username):
@@ -15,12 +15,42 @@ def display_habits(habit_tracker):
     for habit in habit_tracker.view_all_habits():
         print(f"- {habit.habit_name} ({habit.frequency}), Streak: {habit.streak}")
 
+def choose_user():
+    users = load_users_from_db()
+    if not users:
+        print("No users found. Please create a new user.")
+        return None
+
+    print("\nUsers:")
+    for idx, (user_id, username) in enumerate(users, start=1):
+        print(f"{idx}. {username}")
+
+    choice = input("Choose a user by number or type 'new' to create a new user: ")
+    if choice.lower() == 'new':
+        return None
+
+    try:
+        user_idx = int(choice) - 1
+        if 0 <= user_idx < len(users):
+            return users[user_idx]
+    except ValueError:
+        pass
+
+    print("Invalid choice. Please try again.")
+    return choose_user()
+
 def main():
     create_table()
     
     print("Welcome to the Habit Tracker!")
-    username = input("Enter your username: ")
-    user = create_user(username)
+    user_info = choose_user()
+    if not user_info:
+        username = input("Enter a new username: ")
+        user = create_user(username)
+    else:
+        user_id, username = user_info
+        user = User(username, user_id)
+    
     habit_tracker = HabitTracker(user.user_id)
     analytics = Analytics(habit_tracker.view_all_habits())
 
@@ -35,7 +65,8 @@ def main():
         print("7. Add custom reward")
         print("8. View custom rewards")
         print("9. Delete a habit")
-        print("10. Quit")
+        print("10. Switch user")
+        print("11. Quit")
         
         choice = input("Choose an option: ")
 
@@ -105,6 +136,17 @@ def main():
             display_habits(habit_tracker)
 
         elif choice == '10':
+            user_info = choose_user()
+            if not user_info:
+                username = input("Enter a new username: ")
+                user = create_user(username)
+            else:
+                user_id, username = user_info
+                user = User(username, user_id)
+            habit_tracker = HabitTracker(user.user_id)
+            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
+
+        elif choice == '11':
             print("Goodbye!")
             break
 
