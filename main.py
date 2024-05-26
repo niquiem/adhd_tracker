@@ -2,7 +2,7 @@ from user import User
 from habit import Habit
 from habittracker import HabitTracker
 from reward import Reward
-from database import create_table, add_user_to_db, get_user_id, load_users_from_db
+from database import create_table, add_user_to_db, get_user_id, load_users_from_db, delete_user_from_db
 from analytics import Analytics
 
 def create_user(username):
@@ -38,6 +38,30 @@ def choose_user():
 
     print("Invalid choice. Please try again.")
     return choose_user()
+def delete_user():
+    users = load_users_from_db()
+    if not users:
+        print("No users found.")
+        return
+
+    print("\nUsers:")
+    for idx, (user_id, username) in enumerate(users, start=1):
+        print(f"{idx}. {username}")
+
+    choice = input("Choose a user by number to delete or type 'cancel' to go back: ")
+    if choice.lower() == 'cancel':
+        return
+
+    try:
+        user_idx = int(choice) - 1
+        if 0 <= user_idx < len(users):
+            user_id, username = users[user_idx]
+            delete_user_from_db(user_id)
+            print(f"User '{username}' deleted.")
+        else:
+            print("Invalid choice.")
+    except ValueError:
+        print("Invalid input.")
 
 def main():
     create_table()
@@ -66,7 +90,8 @@ def main():
         print("8. View custom rewards")
         print("9. Delete a habit")
         print("10. Switch user")
-        print("11. Quit")
+        print("11. Delete user")
+        print("12. Quit")
         
         choice = input("Choose an option: ")
 
@@ -79,7 +104,7 @@ def main():
             habit = Habit(habit_name, frequency)
             habit.set_reward(habit_tracker.reward)
             habit_tracker.add_habit(habit)
-            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
+            analytics = Analytics(habit_tracker.view_all_habits())
             print(f"Habit '{habit_name}' added.")
 
         elif choice == '2':
@@ -131,7 +156,7 @@ def main():
         elif choice == '9':
             habit_name = input("Enter the name of the habit to delete: ")
             habit_tracker.remove_habit(habit_name)
-            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
+            analytics = Analytics(habit_tracker.view_all_habits())  
             print(f"Habit '{habit_name}' deleted.")
             display_habits(habit_tracker)
 
@@ -144,9 +169,12 @@ def main():
                 user_id, username = user_info
                 user = User(username, user_id)
             habit_tracker = HabitTracker(user.user_id)
-            analytics = Analytics(habit_tracker.view_all_habits())  # Update analytics
+            analytics = Analytics(habit_tracker.view_all_habits())  
 
         elif choice == '11':
+            delete_user()
+
+        elif choice == '12':
             print("Goodbye!")
             break
 

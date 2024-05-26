@@ -89,6 +89,13 @@ def get_user_id(username):
         c.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = c.fetchone()
         return user_id[0] if user_id else None
+    
+def delete_user_from_db(user_id):
+    with create_connection() as conn:
+        c = conn.cursor()
+        execute_with_retry(c, "DELETE FROM habits WHERE user_id = ?", (user_id,))
+        execute_with_retry(c, "DELETE FROM users WHERE id = ?", (user_id,))
+        conn.commit()
 
 def initialize_users_and_habits():
     create_table()
