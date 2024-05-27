@@ -3,11 +3,11 @@ import time
 from datetime import datetime, timedelta
 from habit import Habit
 
-def create_connection():
+def create_connection(): # Create a connection to the database
     conn = sqlite3.connect('habits.db', timeout=30)
     return conn
 
-def create_table():
+def create_table(): # Create the tables in the database and ussers if they don't exist
     with create_connection() as conn:
         c = conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS habits
@@ -15,7 +15,7 @@ def create_table():
         c.execute('''CREATE TABLE IF NOT EXISTS users
                      (id INTEGER PRIMARY KEY, username TEXT)''')
 
-def alter_table_add_column():
+def alter_table_add_column(): #Add the user_id column to the habits table if it doesn't exist
     with create_connection() as conn:
         c = conn.cursor()
         try:
@@ -23,7 +23,7 @@ def alter_table_add_column():
         except sqlite3.OperationalError:
             pass
 
-def execute_with_retry(cursor, query, params=()):
+def execute_with_retry(cursor, query, params=()): #Execute a query with retries in case of an OperationalError
     retries = 5
     while retries > 0:
         try:
@@ -35,27 +35,27 @@ def execute_with_retry(cursor, query, params=()):
                 raise
             time.sleep(2)
 
-def add_habit_to_db(habit, user_id):
+def add_habit_to_db(habit, user_id): # Add a habit to the database for a specific user
     with create_connection() as conn:
         c = conn.cursor()
         execute_with_retry(c, "INSERT INTO habits (user_id, name, frequency, streak, completion_dates) VALUES (?, ?, ?, ?, ?)", 
                            (user_id, habit.habit_name, habit.frequency, habit.streak, ','.join(habit.completion_dates)))
         conn.commit()
 
-def remove_habit_from_db(habit_name, user_id):
+def remove_habit_from_db(habit_name, user_id): #Remove a habit from the database for a specific user
     with create_connection() as conn:
         c = conn.cursor()
         execute_with_retry(c, "DELETE FROM habits WHERE user_id = ? AND name = ?", (user_id, habit_name))
         conn.commit()
 
-def update_habit_in_db(habit, user_id):
+def update_habit_in_db(habit, user_id): #Update a habit in the database for a specific user
     with create_connection() as conn:
         c = conn.cursor()
         execute_with_retry(c, "UPDATE habits SET streak = ?, completion_dates = ? WHERE user_id = ? AND name = ?", 
                            (habit.streak, ','.join(habit.completion_dates), user_id, habit.habit_name))
         conn.commit()
 
-def load_habits_from_db(user_id):
+def load_habits_from_db(user_id): #Load the habits from the database for a specific user
     with create_connection() as conn:
         c = conn.cursor()
         c.execute("SELECT name, frequency, streak, completion_dates FROM habits WHERE user_id = ?", (user_id,))
@@ -71,33 +71,33 @@ def load_habits_from_db(user_id):
             habits.append(habit)
         return habits
 
-def load_users_from_db():
+def load_users_from_db(): #Load the users from the database
     with create_connection() as conn:
         c = conn.cursor()
         c.execute("SELECT id, username FROM users")
         return c.fetchall()
 
-def add_user_to_db(username):
+def add_user_to_db(username): #Add a new user to the database
     with create_connection() as conn:
         c = conn.cursor()
         execute_with_retry(c, "INSERT INTO users (username) VALUES (?)", (username,))
         conn.commit()
 
-def get_user_id(username):
+def get_user_id(username): #Get the user ID for a specific username
     with create_connection() as conn:
         c = conn.cursor()
         c.execute("SELECT id FROM users WHERE username = ?", (username,))
         user_id = c.fetchone()
         return user_id[0] if user_id else None
     
-def delete_user_from_db(user_id):
+def delete_user_from_db(user_id): #Delete a user from the database
     with create_connection() as conn:
         c = conn.cursor()
         execute_with_retry(c, "DELETE FROM habits WHERE user_id = ?", (user_id,))
         execute_with_retry(c, "DELETE FROM users WHERE id = ?", (user_id,))
         conn.commit()
 
-def initialize_users_and_habits():
+def initialize_users_and_habits(): #Initialize the database with some predefined users and habits
     create_table()
     alter_table_add_column()  
     users = ["HarryPotterFan"]

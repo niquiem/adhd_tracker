@@ -5,16 +5,19 @@ from reward import Reward
 from database import create_table, add_user_to_db, get_user_id, load_users_from_db, delete_user_from_db
 from analytics import Analytics
 
+# Function to create a new user and add them to the database
 def create_user(username):
     add_user_to_db(username)
     user_id = get_user_id(username)
     return User(username, user_id)
 
+# Function to display all habits
 def display_habits(habit_tracker):
     print(f"\nHabits:")
     for habit in habit_tracker.view_all_habits():
         print(f"- {habit.habit_name} ({habit.frequency}), Streak: {habit.streak}")
 
+# Function to choose a user from the database
 def choose_user():
     users = load_users_from_db()
     if not users:
@@ -22,7 +25,7 @@ def choose_user():
         return None
 
     while True:
-        print("\nUsers:")
+        print("\nUsers:") # Display all users
         for idx, (user_id, username) in enumerate(users, start=1):
             print(f"{idx}. {username}")
 
@@ -44,6 +47,7 @@ def choose_user():
         except ValueError:
             print("Invalid input. Please enter a number.")
 
+# Function to delete a user from the database
 def delete_user():
     users = load_users_from_db()
     if not users:
@@ -69,6 +73,7 @@ def delete_user():
     except ValueError:
         print("Invalid input.")
 
+# Main function to run the Habit Tracker
 def main():
     create_table()
     
@@ -84,7 +89,7 @@ def main():
     habit_tracker = HabitTracker(user.user_id)
     analytics = Analytics(habit_tracker.view_all_habits())
 
-    while True:
+    while True: # Main menu
         print("\nMenu:")
         print("1. Add a habit")
         print("2. View habits")
@@ -101,7 +106,7 @@ def main():
         
         choice = input("Choose an option: ")
 
-        if choice == '1':
+        if choice == '1': # Add a habit
             habit_name = input("Enter the habit name: ")
             frequency = input("Enter the habit frequency (daily/weekly): ")
             if frequency not in ["daily", "weekly"]:
@@ -113,10 +118,10 @@ def main():
             analytics = Analytics(habit_tracker.view_all_habits())
             print(f"Habit '{habit_name}' added.")
 
-        elif choice == '2':
+        elif choice == '2': # View habits
             display_habits(habit_tracker)
 
-        elif choice == '3':
+        elif choice == '3': # Mark habit as complete
             habit_name = input("Enter the name of the habit you completed: ")
             habit, reward_message = habit_tracker.mark_habit_complete(habit_name)
             if habit:
@@ -126,7 +131,7 @@ def main():
             else:
                 print(f"Habit '{habit_name}' not found.")
 
-        elif choice == '4':
+        elif choice == '4': # Mark habit as incomplete
             habit_name = input("Enter the name of the habit you want to mark as incomplete: ")
             habit = next((h for h in habit_tracker.view_all_habits() if h.habit_name == habit_name), None)
             if habit:
@@ -135,38 +140,38 @@ def main():
             else:
                 print(f"Habit '{habit_name}' not found.")
 
-        elif choice == '5':
+        elif choice == '5': # View longest streak
             longest_streak_habit = analytics.longest_streak()
             if longest_streak_habit:
                 print(f"Longest streak: {longest_streak_habit.habit_name} with streak of {longest_streak_habit.streak}")
             else:
                 print("No habits found.")
 
-        elif choice == '6':
+        elif choice == '6': # View most missed habit
             most_missed_habit = analytics.most_missed()
             if most_missed_habit:
                 print(f"Most missed habit: {most_missed_habit.habit_name} with {len(most_missed_habit.completion_dates)} completions")
             else:
                 print("No habits found.")
 
-        elif choice == '7':
+        elif choice == '7': # Add custom reward
             custom_reward = input("Enter the custom reward: ")
             habit_tracker.reward.add_custom_reward(custom_reward)
             print(f"Custom reward '{custom_reward}' added.")
 
-        elif choice == '8':
+        elif choice == '8': # View custom rewards
             print("\nCustom Rewards:")
             for reward in habit_tracker.reward.custom_rewards:
                 print(f"- {reward}")
 
-        elif choice == '9':
+        elif choice == '9': # Delete a habit
             habit_name = input("Enter the name of the habit to delete: ")
             habit_tracker.remove_habit(habit_name)
             analytics = Analytics(habit_tracker.view_all_habits())  
             print(f"Habit '{habit_name}' deleted.")
             display_habits(habit_tracker)
 
-        elif choice == '10':
+        elif choice == '10': # Switch user
             user_info = choose_user()
             if not user_info:
                 username = input("Enter a new username: ")
@@ -177,10 +182,10 @@ def main():
             habit_tracker = HabitTracker(user.user_id)
             analytics = Analytics(habit_tracker.view_all_habits())  
 
-        elif choice == '11':
+        elif choice == '11': # Delete user
             delete_user()
 
-        elif choice == '12':
+        elif choice == '12': # Quit the program
             print("Goodbye!")
             break
 
