@@ -21,23 +21,29 @@ def choose_user():
         print("No users found. Please create a new user.")
         return None
 
-    print("\nUsers:")
-    for idx, (user_id, username) in enumerate(users, start=1):
-        print(f"{idx}. {username}")
+    while True:
+        print("\nUsers:")
+        for idx, (user_id, username) in enumerate(users, start=1):
+            print(f"{idx}. {username}")
 
-    choice = input("Choose a user by number or type 'new' to create a new user: ")
-    if choice.lower() == 'new':
-        return None
+        try:
+            choice = input("Choose a user by number or type 'new' to create a new user: ")
+        except EOFError:
+            print("\nEOFError: No input received. Exiting...")
+            return None
 
-    try:
-        user_idx = int(choice) - 1
-        if 0 <= user_idx < len(users):
-            return users[user_idx]
-    except ValueError:
-        pass
+        if choice.lower() == 'new':
+            return None
 
-    print("Invalid choice. Please try again.")
-    return choose_user()
+        try:
+            user_idx = int(choice) - 1
+            if 0 <= user_idx < len(users):
+                return users[user_idx]
+            else:
+                print("Invalid choice. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
 def delete_user():
     users = load_users_from_db()
     if not users:
