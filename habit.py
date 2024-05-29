@@ -6,7 +6,7 @@ class Habit:
         Initialize a Habit object.
 
         :param habit_name: Name of the habit
-        :param frequency: Frequency of the habit (e.g., daily, weekly)
+        :param frequency: Periodicity of the habit (e.g., daily, weekly)
         :param streak: Current streak of consecutive completions (default is 0)
         :param completion_dates: List of dates when the habit was completed (default is None, which initializes an empty list)
         """
