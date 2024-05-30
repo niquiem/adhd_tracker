@@ -26,6 +26,12 @@ class TestReward(unittest.TestCase):
         self.reward.add_custom_reward("Play a game of wizard's chess")
         self.assertIn("Play a game of wizard's chess", self.reward.custom_rewards)
 
+    def test_add_multiple_custom_rewards(self):
+        rewards = ["Play a game of wizard's chess", "Watch a Quidditch match"]
+        for r in rewards:
+            self.reward.add_custom_reward(r)
+        self.assertEqual(self.reward.custom_rewards, rewards)
+
     @patch('random.choice', return_value="Take a 5-minute break")
     def test_trigger_with_initial_rewards(self, mock_choice):
         reward = self.reward.trigger()
@@ -43,6 +49,13 @@ class TestReward(unittest.TestCase):
         self.reward.add_custom_reward("Play a game of wizard's chess")
         reward = self.reward.trigger()
         self.assertEqual(reward, "Play a game of wizard's chess")
+        mock_choice.assert_called_once_with(self.reward.reward_pool + self.reward.custom_rewards)
+
+    @patch('random.choice', return_value="Watch a Quidditch match")
+    def test_trigger_with_both_rewards(self, mock_choice):
+        self.reward.add_custom_reward("Watch a Quidditch match")
+        reward = self.reward.trigger()
+        self.assertEqual(reward, "Watch a Quidditch match")
         mock_choice.assert_called_once_with(self.reward.reward_pool + self.reward.custom_rewards)
 
 if __name__ == '__main__':
