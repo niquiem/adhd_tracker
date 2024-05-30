@@ -13,13 +13,13 @@ def create_user(username):
 
 # Function to display all habits
 def display_habits(habit_tracker):
-    print(f"\nHabits:")
+    print(f"\nHabits:") # Display all habits
     for habit in habit_tracker.view_all_habits():
         print(f"- {habit.habit_name} ({habit.frequency}), Streak: {habit.streak}")
 
 # Function to choose a user from the database
 def choose_user():
-    users = load_users_from_db()
+    users = load_users_from_db() # Load all users from the database
     if not users:
         print("No users found. Please create a new user.")
         return None
@@ -54,7 +54,7 @@ def delete_user():
         print("No users found.")
         return
 
-    print("\nUsers:")
+    print("\nUsers:") # Display all users
     for idx, (user_id, username) in enumerate(users, start=1):
         print(f"{idx}. {username}")
 
@@ -75,15 +75,15 @@ def delete_user():
 
 # Main function to run the Habit Tracker
 def main():
-    create_table()
+    create_table() # Create the database table if it doesn't exist
 
     print("Welcome to the Habit Tracker!")
     user_info = choose_user()
-    if not user_info:
+    if not user_info: # If no user is chosen, create a new user
         username = input("Enter a new username: ")
         user = create_user(username)
     else:
-        user_id, username = user_info
+        user_id, username = user_info # If a user is chosen, load the user
         user = User(username, user_id)
 
     habit_tracker = HabitTracker(user.user_id)
@@ -188,7 +188,7 @@ def main():
                 print("No habits found.")
 
         elif choice == '12':  # View habits with the same periodicity
-            frequency = input("Enter the frequency (daily/weekly): ")
+            frequency = input("Enter the periodicity (daily/weekly): ")
             if frequency not in ["daily", "weekly"]:
                 print("Invalid periodicity. Please enter 'daily' or 'weekly'.")
                 continue
